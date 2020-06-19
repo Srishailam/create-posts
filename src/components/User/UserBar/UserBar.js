@@ -3,15 +3,15 @@ import Logout from '../Logout/Logout';
 import Login from '../Login/Login';
 import Register from '../Register/Register';
 
-const UserBar = ({user, setUser}) => {
+const UserBar = ({user, dispatch}) => {
   const renderContent = () => {
     if (user) {
-      return <Logout user={user} setUser={setUser}/>
+      return <Logout user={user} dispatch={dispatch}/>
     } else {
       return (
         <>
-          <Login setUser={setUser}/>
-          <Register setUser={setUser}/>
+          <Login dispatch={dispatch}/>
+          <Register dispatch={dispatch}/>
         </>
       )
     }

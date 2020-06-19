@@ -1,10 +1,11 @@
 import React from 'react';
+import { logoutAction } from '../../../actions/userActions';
 
-const Logout = ({ user, setUser }) => {
+const Logout = ({ user, dispatch }) => {
 
   return (
     <div className="Logout">
-      <form onSubmit={e => { e.preventDefault(); setUser(''); }}>
+      <form onSubmit={e => { e.preventDefault(); dispatch(logoutAction()); }}>
         Logged In as: <b>{user}</b>
         <input type="submit" value="Logout" />
       </form>
