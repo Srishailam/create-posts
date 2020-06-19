@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { registerAction } from '../../../actions/userActions';
 
-const Register = ({ setUser }) => {
+const Register = ({ dispatch }) => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('')
@@ -15,7 +16,7 @@ const Register = ({ setUser }) => {
   }
   return (
     <div className="Register">
-      <form onSubmit={e => { e.preventDefault(); setUser(userName); }}>
+      <form onSubmit={e => { e.preventDefault(); dispatch(registerAction); }}>
         <label htmlFor="Register_UserName">User Name:</label>
         <input id="Register_UserName" type="text" name="Register_UserName" value={userName} onChange={handleUserName} autoComplete="off" />
         <label htmlFor="Register_Password">Password:</label>

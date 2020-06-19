@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { creatPostAction } from '../../../actions/postActions';
 
-const CreatePost = ({ user, posts, setPosts }) => {
+const CreatePost = ({ user, posts, dispatch }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
@@ -11,12 +12,8 @@ const CreatePost = ({ user, posts, setPosts }) => {
     setTitle(e.target.value);
   }
   const handleCreate = () => {
-    const newPost = {
-      title,
-      content,
-      author: user
-    };
-    setPosts([newPost, ...posts]);
+    const author = user;
+    dispatch(creatPostAction(title, content, author));
     resetCreatePostForm();
   }
   const resetCreatePostForm = () => {
