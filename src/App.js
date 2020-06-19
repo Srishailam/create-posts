@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 
 import UserBar from './components/User/UserBar/UserBar';
 import CreatePost from './components/Post/CreatePost/CreatePost';
@@ -14,6 +14,15 @@ const defaultPosts = [
 function App() {
   const [state, dispatch] = useReducer(appReducer, { user: '', posts: defaultPosts });
   const { user, posts } = state;
+
+  useEffect(() => {
+    if (user) {
+      document.title = `${user} - React Hooks Blog`;
+    } else {
+      document.title = `Welcome - React Hooks Blog`;
+    }
+  }, [user])
+
   return (
     <div className="App">
       <UserBar user={user} dispatch={dispatch} />
