@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react';
+import React, { useReducer } from 'react';
 import UserBar from './components/User/UserBar/UserBar';
 import CreatePost from './components/Post/CreatePost/CreatePost';
 import PostList from './components/Post/PostList/PostList';
