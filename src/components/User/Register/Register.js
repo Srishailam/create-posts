@@ -16,7 +16,7 @@ const Register = ({ dispatch }) => {
   }
   return (
     <div className="Register">
-      <form onSubmit={e => { e.preventDefault(); dispatch(registerAction); }}>
+      <form onSubmit={e => { e.preventDefault(); dispatch(registerAction(userName)); }}>
         <label htmlFor="Register_UserName">User Name:</label>
         <input id="Register_UserName" type="text" name="Register_UserName" value={userName} onChange={handleUserName} autoComplete="off" />
         <label htmlFor="Register_Password">Password:</label>
