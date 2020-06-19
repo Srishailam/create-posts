@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { logoutAction } from '../../../actions/userActions';
 
 const Logout = ({ user, dispatch }) => {
-
   return (
     <div className="Logout">
       <form onSubmit={e => { e.preventDefault(); dispatch(logoutAction()); }}>
