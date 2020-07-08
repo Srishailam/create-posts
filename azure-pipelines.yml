@@ -20,7 +20,7 @@ jobs:
     - script: |
         npm install
         npm run build
-    displayName: 'npm install and build'
+    displayName: 'Job1'
   - job: Job2
     pool:
       vmImage: 'ubuntu-latest'
@@ -34,4 +34,4 @@ jobs:
     - script: |
         npm install
         npm run build
-    displayName: 'npm install and build'
+    displayName: 'Job2'
