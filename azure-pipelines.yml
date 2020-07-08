@@ -35,3 +35,17 @@ jobs:
         npm install
         npm run build
     displayName: 'Job2'
+  - job: Job3
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        npm install
+        npm run build
+    displayName: 'Job3'
