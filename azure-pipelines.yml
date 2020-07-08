@@ -1,51 +1,138 @@
+name: v$(MajorVersion).$(MinorVersion).$(PatchVersion)-$(Build.SourceBranchName)-$(rev:r)
+
 # Node.js with React
 # Build a Node.js project that uses React.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
-- master
+  - master
 
 jobs:
-  - job: Job1
+  - job: Test
     pool:
-      vmImage: 'ubuntu-latest'
-
+      vmImage: "Ubuntu-16.04"
     steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
+      - task: NodeTool@0
+        displayName: "Install Node.js"
+        inputs:
+          versionSpec: "10.x"
 
-    - script: |
-        npm install
-        npm run build
-    displayName: 'Job1'
-  - job: Job2
+      - script: |
+          npm install
+          CI=true npm run test -- --reporters=jest-junit
+        displayName: "Jest Tests"
+
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testRunner: JUnit
+          testResultsFiles: "**/junit.xml"
+  - job: Publish_Sonar_Result
     pool:
-      vmImage: 'ubuntu-latest'
-
+      vmImage: "Ubuntu 16.04"
     steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
+      - task: NodeTool@0
+        displayName: "Use Node 12.13.1"
+        inputs:
+          versionSpec: 12.13.1
 
-    - script: |
-        npm install
-        npm run build
-    displayName: 'Job2'
-  - job: Job3
+      - task: Npm@1
+        displayName: "npm install"
+      - script: |
+          npm install
+          npm run test:coverage
+        displayName: "Code Coverage"
+
+  - job: BuildAndPublish
     pool:
-      vmImage: 'ubuntu-latest'
-
+      vmImage: "Ubuntu-16.04"
     steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
+      - task: NodeTool@0
+        displayName: "Install Node.js"
+        inputs:
+          versionSpec: "12.x"
+      # Set default env variables
+      - script: |
+          echo '##vso[task.setvariable variable=REACT_APP_HOTJAR_ENABLED]DISABLED'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_DOMAIN]uipathcloud.eu.auth0.com'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_CLIENT_ID]18Mc0FDXfQcdWbZkBJnUFhz6zDiVpr4J'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_SCOPE]openid profile email'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_RESPONSE_TYPE]token id_token'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_AUDIENCE]https://dev-navigator-api.azurewebsites.net/api/v1/'
+          echo '##vso[task.setvariable variable=REACT_APP_API_URL]https://dev-navigator-frontdoor-api.azurewebsites.net'
+          echo '##vso[task.setvariable variable=REACT_APP_SOCKET_URL]https://api-dev.uipath-enterprise-connect.com'
+          echo '##vso[task.setvariable variable=REACT_APP_APP_INSIGHTS_KEY]d8e264f4-0670-40cc-8a1b-320bf0788e0d'
+          echo '##vso[task.setvariable variable=REACT_APP_GOOGLE_TAG_MANAGER_ID]GTM-MSS2MTS'
+          echo '##vso[task.setvariable variable=REACT_APP_LAUNCH_DARKLY_CLIENT_SIDE_ID]5e8225d58c3a2e073ce699fa'
+      # Set qa env variables
+      - script: |
+          echo '##vso[task.setvariable variable=REACT_APP_HOTJAR_ENABLED]ENABLED'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_DOMAIN]uipath-cloud-preprod.eu.auth0.com'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_CLIENT_ID]GKZGgKUJFTrvVpyrZdH3q4FqEEuipKgv'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_SCOPE]openid profile email'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_RESPONSE_TYPE]token id_token'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_AUDIENCE]https://staging-navigator-api.azurewebsites.net'
+          echo '##vso[task.setvariable variable=REACT_APP_API_URL]https://stg-rpnavigator-frontdoor-api.azurewebsites.net'
+          echo '##vso[task.setvariable variable=REACT_APP_SOCKET_URL]https://qa-navigator-api.azurewebsites.net'
+          echo '##vso[task.setvariable variable=REACT_APP_APP_INSIGHTS_KEY]92101564-9ac8-4067-9c01-f224196ddfb2'
+          echo '##vso[task.setvariable variable=REACT_APP_GOOGLE_TAG_MANAGER_ID]GTM-MSS2MTS'
+          echo '##vso[task.setvariable variable=REACT_APP_LAUNCH_DARKLY_CLIENT_SIDE_ID]5e8223df8c3a2e073ce69996'
+        condition: eq(variables['Build.SourceBranchName'], 'qa')
+      # Set pentest env variables
+      - script: |
+          echo '##vso[task.setvariable variable=REACT_APP_HOTJAR_ENABLED]DISABLED'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_DOMAIN]uipathcloud.eu.auth0.com'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_CLIENT_ID]18Mc0FDXfQcdWbZkBJnUFhz6zDiVpr4J'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_SCOPE]openid profile email'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_RESPONSE_TYPE]token id_token'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_AUDIENCE]https://dev-navigator-api.azurewebsites.net/api/v1/'
+          echo '##vso[task.setvariable variable=REACT_APP_API_URL]https://rpanavigator-pentest-frontdoor-api.azurewebsites.net'
+          echo '##vso[task.setvariable variable=REACT_APP_SOCKET_URL]https://rpanavigator-pentest-api.azurewebsites.net'
+          echo '##vso[task.setvariable variable=REACT_APP_APP_INSIGHTS_KEY]e4aa5ad2-b970-4d8e-90d8-1cb56ad43bc5'
+          echo '##vso[task.setvariable variable=REACT_APP_GOOGLE_TAG_MANAGER_ID]GTM-MSS2MTS'
+          echo '##vso[task.setvariable variable=REACT_APP_LAUNCH_DARKLY_CLIENT_SIDE_ID]5e8225cd8c3a2e073ce699f5'
+        condition: eq(variables['Build.SourceBranchName'], 'pentest')
+      # Set staging env variables
+      - script: |
+          echo '##vso[task.setvariable variable=REACT_APP_HOTJAR_ENABLED]DISABLED'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_DOMAIN]uipathcloud.eu.auth0.com'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_CLIENT_ID]18Mc0FDXfQcdWbZkBJnUFhz6zDiVpr4J'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_SCOPE]openid profile email'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_RESPONSE_TYPE]token id_token'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_AUDIENCE]https://staging-navigator-api.azurewebsites.net/api/v1/'
+          echo '##vso[task.setvariable variable=REACT_APP_API_URL]https://staging-navigator-api.azurewebsites.net'
+          echo '##vso[task.setvariable variable=REACT_APP_SOCKET_URL]https://staging-navigator-api.azurewebsites.net'
+          echo '##vso[task.setvariable variable=REACT_APP_APP_INSIGHTS_KEY]435043da-5640-47f3-930e-56a7fe99b204'
+          echo '##vso[task.setvariable variable=REACT_APP_GOOGLE_TAG_MANAGER_ID]GTM-MSS2MTS'
+          echo '##vso[task.setvariable variable=REACT_APP_LAUNCH_DARKLY_CLIENT_SIDE_ID]5e8225cd8c3a2e073ce699f5'
+        condition: eq(variables['Build.SourceBranchName'], 'staging')
+      # Set master env variables
+      - script: |
+          echo '##vso[task.setvariable variable=REACT_APP_HOTJAR_ENABLED]ENABLED'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_DOMAIN]uipath.eu.auth0.com'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_CLIENT_ID]H71lBJ7yb0qMqZ26st7746jutMRdSMxW'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_SCOPE]openid profile email'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_RESPONSE_TYPE]token id_token'
+          echo '##vso[task.setvariable variable=REACT_APP_AUTH_AUDIENCE]https://connect.enterprise.uipath.com'
+          echo '##vso[task.setvariable variable=REACT_APP_API_URL]https://connect-enterprise-frontdoor-api.uipath.com'
+          echo '##vso[task.setvariable variable=REACT_APP_SOCKET_URL]https://connect-enterprise-api.uipath.com'
+          echo '##vso[task.setvariable variable=REACT_APP_APP_INSIGHTS_KEY]0c57a04d-036b-42dc-9a4b-33397744021b'
+          echo '##vso[task.setvariable variable=REACT_APP_GOOGLE_TAG_MANAGER_ID]GTM-NW4BN29'
+          echo '##vso[task.setvariable variable=REACT_APP_LAUNCH_DARKLY_CLIENT_SIDE_ID]5e8223df8c3a2e073ce69997'
+        condition: eq(variables['Build.SourceBranchName'], 'master')
+      - script: |
+          npm install
+          npm install increase-memory-limit -g
+          REACT_APP_ENV='$(Build.SourceBranchName)' GENERATE_SOURCEMAP=false npm run build --max-old-space-size=8192
+        displayName: "Build"
 
-    - script: |
-        npm install
-        npm run build
-    displayName: 'Job3'
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: "build"
+          archiveFile: "$(Build.ArtifactStagingDirectory)/ReactApp.zip"
+
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: "appdrop"
+          targetPath: "$(Build.ArtifactStagingDirectory)/ReactApp.zip"
