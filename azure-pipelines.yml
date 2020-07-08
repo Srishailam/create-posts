@@ -44,32 +44,6 @@ jobs:
           npm run test:coverage
         displayName: "Code Coverage"
 
-      - task: SonarCloudPrepare@1
-        displayName: Prepare for SonarCloud Analysis for uipath-automation-hub-front-end
-        inputs:
-          SonarCloud: "UiPathAutomationHub_Frontend_SonarCloud"
-          organization: "ui"
-          scannerMode: "CLI"
-          extraProperties: |
-            sonar.projectKey=UiPath_RPA-Navigator-frontend
-            sonar.organization=ui
-            sonar.host.url=https://sonarcloud.io
-            sonar.projectVersion=1.0
-            sonar.sourceEncoding=UTF-8
-            sonar.sources=src,
-            sonar.exclusions=**/node_modules/**, src/components/Data/data.js
-            sonar.tests=src
-            sonar.test.inclusions=src/**/*.test.js, src/**/*.test.ts, src/**/*.test.tsx
-            sonar.javascript.lcov.reportPaths=coverage/lcov.info
-            sonar.typescript.lcov.reportPaths=coverage/lcov.info
-
-      - task: SonarCloudAnalyze@1
-        displayName: Run SonarCloud analysis for uipath-automation-hub-front-end
-
-      - task: SonarCloudPublish@1
-        displayName: Publish SonarCloud analysis results for uipath-automation-hub-front-end
-        inputs:
-          pollingTimeoutSec: "300"
   - job: BuildAndPublish
     pool:
       vmImage: "Ubuntu-16.04"
